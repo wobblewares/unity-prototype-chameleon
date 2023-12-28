@@ -1,0 +1,18 @@
+{
+  "name": "com.wobblewares.kit",
+  "version": "1.0.2",
+  "displayName": "Wobblewares - Kit",
+  "type": "tool",
+  "keywords": [
+    "wobble",
+    "kit",
+    "shaders",
+    "Tools"
+  ],
+  "author": {
+    "name": "wobblewares",
+    "email": "ian@wobbleware.com.au",
+    "url": ""
+  },
+  "description": "Package containing various wobble shaders for rendering wobble font, wobble ui, toon materials and flipbook animations."
+}

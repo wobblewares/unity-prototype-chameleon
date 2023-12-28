@@ -1,0 +1,60 @@
+name: Build
+run-name: Build
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build-macos:
+    name: Build webGL
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      
+      # Checkout the project repository into ${{github.workspace}}/project
+      - name: Checkout Unity project repository
+        uses: actions/checkout@v4
+        with:
+          path: project
+          fetch-depth: 0
+          lfs: true
+          
+      # Cache Library folder
+      - name: Use Library Cache
+        uses: actions/cache@v3
+        with:
+          path: project/Library
+          key: library-unityprojecttemplate-webgl
+          restore-keys: |
+            library-unityprojecttemplate
+            library
+      
+      # Build WebGL standalone
+      - name: Build WebGL v${{ github.ref_name }}
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+          versioning: Custom
+          version: ${{ github.ref_name }}
+          projectPath: project
+            
+      # Upload as artifact
+      - name: Upload Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: WebGL
+          path: build
+          
+      # Upload to itch.io
+      - name: Upload to itch.io
+        uses: robpc/itchio-upload-action@v1
+        with:
+          path: build/
+          project: wobblewares/unity-project-template
+          channel: webgl
+          version: ${{ github.ref_name }}
+          api-key: ${{ secrets.ITCH_API_KEY }}
