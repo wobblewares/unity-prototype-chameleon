@@ -22,50 +22,7 @@ jobs:
         with:
           path: project
           fetch-depth: 0
-  
-      # Increment the release version and commit it based on spec
-      - name: Bump Release version
-        run: |
-          # Store the file path
-          filePath="${GITHUB_WORKSPACE}/project/ProjectSettings/ProjectSettings.asset"
-          
-          # Store the original file content
-          fileContent=$(<"$filePath")
-          
-          # Search for the line containing "bundleVersion"
-          bundleVersionLine=$(echo "$fileContent" | grep -E "bundleVersion:" | head -n 1)
-          currentVersion=$(echo "$bundleVersionLine" | cut -d ':' -f 2 | tr -d '[:space:]')
-          echo "BundleVersionLine: $bundleVersionLine"
-          
-          # Increment the version number
-          newVersion=$((currentVersion + 1))
-          
-          # Replace the old version in the line
-          updatedLine=$(echo "$bundleVersionLine" | sed "s/$currentVersion/$newVersion/")
-          
-          # Replace the old line with the updated line in the file content
-          fileContent=$(echo "$fileContent" | sed "s/$(printf '%s\n' "$bundleVersionLine" | sed 's/[\&/]/\\&/g')/$updatedLine/")
-          
-          # Write the updated content back to the file
-          echo "$fileContent" > "$filePath"
-          
-          # Get the line again
-          bundleVersionLineEdited=$(echo "$fileContent" | grep -E "bundleVersion:" | head -n 1)
-          echo "Edited Version:"
-          echo "$bundleVersionLineEdited"
-      
-      # Commit and push branch
-      - name: Tag, commit and push branch
-        run: |
-          cd ${{github.workspace}}/project/
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git pull
-          git checkout -b release/${{github.event.inputs.build_version}}
-          git add ${{github.workspace}}/project/ProjectSettings/ProjectSettings.asset
-          git commit -m "Update release version to ${{github.event.inputs.build_version}}"
-          git push origin release/${{github.event.inputs.build_version}}     
-          
+
       # Cache Library folder
       - name: Use Library Cache
         uses: actions/cache@v3
@@ -85,6 +42,18 @@ jobs:
           versioning: Custom
           version: ${{github.event.inputs.build_version}}
           projectPath: project
+
+      # Commit and push branch
+      - name: Tag, commit and push branch
+        run: |
+          cd ${{github.workspace}}/project/
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git pull
+          git checkout -b release/${{github.event.inputs.build_version}}
+          git add ${{github.workspace}}/project/ProjectSettings/ProjectSettings.asset
+          git commit -m "Update release version to ${{github.event.inputs.build_version}}"
+          git push origin release/${{github.event.inputs.build_version}}     
             
       # Tag and delete the release branch.
       - name: Tag and delete branch
