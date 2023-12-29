@@ -1,30 +1,76 @@
 name: Build
 run-name: Build
 on:
-  push:
-    tags:
-      - '*'
+    workflow_dispatch:
+      inputs:
+        build_version:
+          description: "Build version:"
+          required: true
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 jobs:
   build-macos:
     name: Build webGL
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      
       # Checkout the project repository into ${{github.workspace}}/project
       - name: Checkout Unity project repository
         uses: actions/checkout@v4
         with:
           path: project
           fetch-depth: 0
-          lfs: true
+  
+      # Increment the release version and commit it based on spec
+      - name: Bump Release version
+        run: |
+          # Store the file path
+          filePath="${GITHUB_WORKSPACE}/project/ProjectSettings/ProjectSettings.asset"
+          
+          # Store the original file content
+          fileContent=$(<"$filePath")
+          
+          # Search for the line containing "bundleVersion"
+          bundleVersionLine=$(echo "$fileContent" | grep -E "bundleVersion:" | head -n 1)
+          currentVersion=$(echo "$bundleVersionLine" | cut -d ':' -f 2 | tr -d '[:space:]')
+          echo "BundleVersionLine: $bundleVersionLine"
+          
+          # Increment the version number
+          newVersion=$((currentVersion + 1))
+          
+          # Replace the old version in the line
+          updatedLine=$(echo "$bundleVersionLine" | sed "s/$currentVersion/$newVersion/")
+          
+          # Replace the old line with the updated line in the file content
+          fileContent=$(echo "$fileContent" | sed "s/$(printf '%s\n' "$bundleVersionLine" | sed 's/[\&/]/\\&/g')/$updatedLine/")
+          
+          # Write the updated content back to the file
+          echo "$fileContent" > "$filePath"
+          
+          # Get the line again
+          bundleVersionLineEdited=$(echo "$fileContent" | grep -E "bundleVersion:" | head -n 1)
+          echo "Edited Version:"
+          echo "$bundleVersionLineEdited"
+      
+      # Commit and push branch
+      - name: Tag, commit and push branch
+        run: |
+          cd ${{github.workspace}}/project/
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git pull
+          git checkout -b release/${{github.event.inputs.build_version}}
+          git add ${{github.workspace}}/project/ProjectSettings/ProjectSettings.asset
+          git commit -m "Update release version to ${{github.event.inputs.build_version}}"
+          git push origin release/${{github.event.inputs.build_version}}     
           
       # Cache Library folder
       - name: Use Library Cache
         uses: actions/cache@v3
         with:
           path: project/Library
-          key: library-unityprototypechameleon-webgl
+          key: library-webgl
       
       # Build WebGL standalone
       - name: Build WebGL v${{ github.ref_name }}
@@ -36,15 +82,22 @@ jobs:
         with:
           targetPlatform: WebGL
           versioning: Custom
-          version: ${{ github.ref_name }}
+          version: ${{github.event.inputs.build_version}}
           projectPath: project
             
-      # Upload as artifact
-      - name: Upload Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: WebGL
-          path: build
+      # Tag, and merge in master
+      - name: Tag and merge
+        run: |
+         cd ${{github.workspace}}/project/
+         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+         git config user.name "github-actions[bot]"
+         git fetch
+         git tag "${{github.event.inputs.build_version}}"
+         git push --follow-tags -uorigin release/${{github.event.inputs.build_version}}
+         git checkout main
+         git merge --no-ff release/${{github.event.inputs.build_version}}
+         git push origin main
+         git push origin --delete release/${{github.event.inputs.build_version}}
           
       # Upload to itch.io
       - name: Upload to itch.io
@@ -53,5 +106,5 @@ jobs:
           path: build/
           project: wobblewares/chameleon
           channel: webgl
-          version: ${{ github.ref_name }}
+          version: ${{github.event.inputs.build_version}}
           api-key: ${{ secrets.ITCH_API_KEY }}
