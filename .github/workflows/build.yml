@@ -86,19 +86,19 @@ jobs:
           version: ${{github.event.inputs.build_version}}
           projectPath: project
             
-      # Tag, and merge in master
-      - name: Tag and merge
+      # Tag and delete the release branch.
+      - name: Tag and delete branch
         run: |
-         cd ${{github.workspace}}/project/
-         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-         git config user.name "github-actions[bot]"
-         git fetch
-         git tag "${{github.event.inputs.build_version}}"
-         git push --follow-tags -uorigin release/${{github.event.inputs.build_version}}
-         git checkout main
-         git merge --no-ff release/${{github.event.inputs.build_version}}
-         git push origin main
-         git push origin --delete release/${{github.event.inputs.build_version}}
+          cd ${{github.workspace}}/project/
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git fetch
+          git tag "${{github.event.inputs.build_version}}"
+          git push --tags origin release/${{github.event.inputs.build_version}}
+          git checkout master
+          git merge --no-ff release/${{github.event.inputs.build_version}}
+          git push origin master
+          git push origin --delete release/${{github.event.inputs.build_version}}
           
       # Upload to itch.io
       - name: Upload to itch.io
