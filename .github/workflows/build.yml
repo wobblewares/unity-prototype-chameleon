@@ -24,10 +24,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: project/Library
-          key: library-unityprojecttemplate-webgl
-          restore-keys: |
-            library-unityprojecttemplate
-            library
+          key: library-unityprototypechameleon-webgl
       
       # Build WebGL standalone
       - name: Build WebGL v${{ github.ref_name }}
@@ -54,7 +51,7 @@ jobs:
         uses: robpc/itchio-upload-action@v1
         with:
           path: build/
-          project: wobblewares/unity-project-template
+          project: wobblewares/chameleon
           channel: webgl
           version: ${{ github.ref_name }}
           api-key: ${{ secrets.ITCH_API_KEY }}
