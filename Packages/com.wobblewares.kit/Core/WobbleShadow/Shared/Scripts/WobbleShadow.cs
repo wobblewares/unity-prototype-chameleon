@@ -27,6 +27,8 @@ namespace Wobblewares.Kit
         {
             if (target == null)
                 target = transform.parent;
+            else
+                meshRenderer = target.GetComponent<MeshRenderer>();
     
             UpdateShadowPosition();
         }
@@ -58,17 +60,21 @@ namespace Wobblewares.Kit
             if (target == null)
                 return;
 
-            if (useLocalBounds)
+            if (meshRenderer && useLocalBounds)
             {
-                bounds = target.GetComponent<MeshRenderer>().localBounds;
+                bounds = meshRenderer.localBounds;
                 bounds.center += target.transform.position;
                 bounds.size = new Vector3(bounds.size.x * target.transform.lossyScale.x,
                     bounds.size.y * target.transform.lossyScale.y,
                     bounds.size.z * target.transform.lossyScale.z);
             }
+            else if(meshRenderer)
+            {
+                bounds = meshRenderer.bounds;
+            }
             else
             {
-                bounds = target.GetComponent<MeshRenderer>().bounds;
+                bounds.center = target.transform.position;
             }
    
             transform.position = new Vector3(bounds.center.x, (bounds.center.y - bounds.size.y / 2.0f) - offset, bounds.center.z);
@@ -77,6 +83,7 @@ namespace Wobblewares.Kit
         
 
         private Bounds bounds;
+        private MeshRenderer meshRenderer;
 
         #endregion
     }

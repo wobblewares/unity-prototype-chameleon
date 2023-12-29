@@ -71,3 +71,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 .idea/.idea.unity-project-template.dir/.idea
+.idea/.idea.unity-prototype-chameleon/.idea/.gitignore
+.idea/.idea.unity-prototype-chameleon/.idea/encodings.xml
+.idea/.idea.unity-prototype-chameleon/.idea/indexLayout.xml
+.idea/.idea.unity-prototype-chameleon/.idea/vcs.xml
