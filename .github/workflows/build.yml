@@ -95,9 +95,9 @@ jobs:
           git fetch
           git tag "${{github.event.inputs.build_version}}"
           git push --tags origin release/${{github.event.inputs.build_version}}
-          git checkout master
+          git checkout main
           git merge --no-ff release/${{github.event.inputs.build_version}}
-          git push origin master
+          git push origin main
           git push origin --delete release/${{github.event.inputs.build_version}}
           
       # Upload to itch.io
