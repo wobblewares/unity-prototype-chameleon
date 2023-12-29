@@ -487,7 +487,7 @@ PrefabInstance:
         type: 3}
       propertyPath: target
       value: 
-      objectReference: {fileID: 1880631714}
+      objectReference: {fileID: 0}
     - target: {fileID: 6204890850481025523, guid: 7dfc114d047534352b2c1ce6cc642dbe,
         type: 3}
       propertyPath: m_Name
@@ -646,12 +646,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1253541773}
   m_CullTransparentMesh: 1
---- !u!4 &1880631714 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4410592586691722025, guid: a5ad313dbbb5f49df96f23c850607f4f,
-    type: 3}
-  m_PrefabInstance: {fileID: 7665401058423166871}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2045593171
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,6 +885,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7964412702788885129, guid: a5ad313dbbb5f49df96f23c850607f4f,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -5523277661179574252, guid: b3682355d0c9d4090bd6acc00757aa2d,
+        type: 3}
     - target: {fileID: 7964412702788885129, guid: a5ad313dbbb5f49df96f23c850607f4f,
         type: 3}
       propertyPath: m_UpdateWhenOffscreen
