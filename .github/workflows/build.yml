@@ -9,6 +9,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
+permissions: write-all
 jobs:
   build-macos:
     name: Build webGL
@@ -73,7 +74,7 @@ jobs:
           key: library-webgl
       
       # Build WebGL standalone
-      - name: Build WebGL v${{ github.ref_name }}
+      - name: Build WebGL v${{github.event.inputs.build_version}}
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
